@@ -1,45 +1,52 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
 <html>
 <head>
+<meta charset="ISO-8859-1">
 <title>Email Validation</title>
 </head>
 <body>
-    <h2>Email Validation Example</h2>
+<%
+    String email = request.getParameter("email");
+    boolean isValid = false;
 
-    <form method="post" action="mail.jsp">
-        Enter Email: <input type="text" name="email" required>
-        <input type="submit" value="Check">
-    </form>
+    if (email != null) {
+        int atPos = email.indexOf('@');
+        int dotPos = email.lastIndexOf('.');
 
-    <%
-        String email = request.getParameter("email");
-
-        if (email != null) {
-            boolean isValid = false;
-
-            try {
-                int atPos = email.indexOf("@");
-                int lastAtPos = email.lastIndexOf("@");
-                int dotPos = email.lastIndexOf(".");
-
-                if (atPos > 0 && atPos == lastAtPos) { 
-                    if (dotPos > atPos + 2) { 
-                        if (dotPos < email.length() - 2) { 
-                            isValid = true;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                isValid = false;
-            }
-
-            if (isValid) {
-                out.println("<p style='color:green'>Valid Email ID  : " + email + "</p>");
-            } else {
-                out.println("<p style='color:red'>Invalid Email ID  : " + email + "</p>");
-            }
+        // Conditions:
+        // 1. Only one '@'
+        // 2. At least one '.'
+        // 3. 2+ chars between '@' and '.'
+        // 4. 2+ chars after '.'
+        if (atPos > 0 
+            && email.indexOf('@', atPos + 1) == -1  // only one @
+            && dotPos > atPos + 2                  // at least 2 chars between @ and .
+            && dotPos < email.length() - 2) {      // at least 2 chars after .
+            isValid = true;
         }
-    %>
+    }
+
+    if (email == null) {
+%>
+        <form action="mail.jsp" method="post">
+            Enter Email: <input type="text" name="email" required>
+            <input type="submit" value="Check">
+        </form>
+<%
+    } else {
+        if (isValid) {
+%>
+            <h3> Valid Email ID: <%= email %></h3>
+<%
+        } else {
+%>
+            <h3> Invalid Email ID: <%= email %></h3>
+            <a href="mail.jsp">Try Again</a>
+<%
+        }
+    }
+%>
 </body>
 </html>
